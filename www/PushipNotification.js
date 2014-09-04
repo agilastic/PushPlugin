@@ -107,3 +107,14 @@ function ISODateString(d){return d.getUTCFullYear()+'-'
 +pad(d.getUTCSeconds())+'Z';}
 function pad(n){return n<10?'0'+n:n;}
 return{OnPushReceived:OnPushReceived,NotifyPush:NotifyPush,RegisterOnPuship:RegisterOnPuship,AddTagFilter:AddTagFilter,RemoveTagFilter:RemoveTagFilter,CleanTagFilter:CleanTagFilter,GetTagFilters:GetTagFilters,GetPushMessages:GetPushMessages,DeletePushMessage:DeletePushMessage,GetPushMessagesByDevice:GetPushMessagesByDevice,GetCurrentOs:GetCurrentOs,Clean:Clean,Log:Log,UnRegister:UnRegister,RegisterCurrentPosition:RegisterCurrentPosition,GetAppId:GetAppId,DefaultValue:DefaultValue};}();window.onbeforeunload=function(e){Puship.Common.Log('Unloading...');if(Puship.gcmregid.length>0){Puship.Common.Log('Local unregistering app...');if(window.plugins&&window.plugins.GCM){Puship.Common.Log('Try unregisterding GCM...');Puship.GCM.UnRegister(function(){Puship.Common.Log("unregistered done");},function(){Puship.Common.Log("unregisteder error");});Puship.Common.Log('Try unregisterding GCM... Called');}}};
+
+if(!window.plugins) {
+    window.plugins = {};
+}
+if (!window.plugins.pushNotification) {
+    window.plugins.pushNotification = new PushNotification();
+}
+
+if (typeof module != 'undefined' && module.exports) {
+  module.exports = PushNotification;
+}
