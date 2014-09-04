@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:amazon="http://schemas.android.com/apk/lib/com.amazon.device.ads"
     id="com.phonegap.plugins.PushPlugin"
-    version="2.2.1">
+    version="1.0.0">
 
   <name>PushPlugin</name>
 	<author>Bob Easterday</author>
@@ -17,8 +17,13 @@
 
 	<license>MIT</license>
 
+
 	<js-module src="www/PushNotification.js" name="PushNotification">
         <clobbers target="PushNotification" />
+	</js-module>
+
+	<js-module src="www/PushipNotification.js" name="PushipNotification">
+        <clobbers target="PushipNotification" />
 	</js-module>
 
 	<engines>
