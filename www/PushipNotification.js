@@ -111,10 +111,10 @@ return{OnPushReceived:OnPushReceived,NotifyPush:NotifyPush,RegisterOnPuship:Regi
 if(!window.plugins) {
     window.plugins = {};
 }
-if (!window.plugins.pushNotification) {
-    window.plugins.pushNotification = new PushNotification();
+if (!window.plugins.Puship) {
+    window.plugins.Puship = new Puship();
 }
 
 if (typeof module != 'undefined' && module.exports) {
-  module.exports = PushNotification;
+  module.exports = Puship;
 }
