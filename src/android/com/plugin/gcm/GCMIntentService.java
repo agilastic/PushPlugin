@@ -12,6 +12,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.net.Uri;
+import android.content.res.AssetManager;
+import android.content.res.AssetFileDescriptor;
+import java.io.File;
+import android.media.MediaPlayer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
 
 import com.google.android.gcm.GCMBaseIntentService;
 
@@ -90,13 +98,40 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		
-		int defaults = Notification.DEFAULT_ALL;
-
+		int defaults=Notification.DEFAULT_ALL;
+		
 		if (extras.getString("defaults") != null) {
 			try {
 				defaults = Integer.parseInt(extras.getString("defaults"));
 			} catch (NumberFormatException e) {}
 		}
+		
+		AssetManager am= context.getAssets();
+		String sound=extras.getString("sound");
+		Log.e(TAG, "Requested sound: " + sound);
+		if (am != null && !sound.toLowerCase().equals("default")) {
+			try {
+				String target = "www/res/sounds/" + sound;
+				Log.e(TAG, "target sound path: " + target);
+				//ur= Uri.fromFile(context.getFileStreamPath(target).getAbsoluteFile());
+				AssetFileDescriptor afd= am.openFd(target);
+				
+				MediaPlayer player = new MediaPlayer();
+				player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+				player.prepare();
+				player.start();
+				
+				defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE;
+				
+			} catch (Exception e) {
+				Log.e(TAG, "Exception: " + e.getMessage());
+			}
+		} else{
+			Log.e(TAG, "AM is null");
+		}
+		
+
+
 		
 		NotificationCompat.Builder mBuilder =
 			new NotificationCompat.Builder(context)
