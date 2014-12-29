@@ -49,7 +49,7 @@
 
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
 
-    UIRemoteNotificationType notificationTypes = UIRemoteNotificationTypeNone;
+    UIUserNotificationType notificationTypes = UIUserNotificationTypeNone;
     id badgeArg = [options objectForKey:@"badge"];
     id soundArg = [options objectForKey:@"sound"];
     id alertArg = [options objectForKey:@"alert"];
@@ -57,35 +57,36 @@
     if ([badgeArg isKindOfClass:[NSString class]])
     {
         if ([badgeArg isEqualToString:@"true"])
-            notificationTypes |= UIRemoteNotificationTypeBadge;
+            notificationTypes |= UIUserNotificationTypeBadge;
     }
     else if ([badgeArg boolValue])
-        notificationTypes |= UIRemoteNotificationTypeBadge;
+        notificationTypes |= UIUserNotificationTypeBadge;
     
     if ([soundArg isKindOfClass:[NSString class]])
     {
         if ([soundArg isEqualToString:@"true"])
-            notificationTypes |= UIRemoteNotificationTypeSound;
+            notificationTypes |= UIUserNotificationTypeSound;
     }
     else if ([soundArg boolValue])
-        notificationTypes |= UIRemoteNotificationTypeSound;
+        notificationTypes |= UIUserNotificationTypeSound;
     
     if ([alertArg isKindOfClass:[NSString class]])
     {
         if ([alertArg isEqualToString:@"true"])
-            notificationTypes |= UIRemoteNotificationTypeAlert;
+            notificationTypes |= UIUserNotificationTypeAlert;
     }
     else if ([alertArg boolValue])
-        notificationTypes |= UIRemoteNotificationTypeAlert;
+        notificationTypes |= UIUserNotificationTypeAlert;
     
     self.callback = [options objectForKey:@"ecb"];
 
-    if (notificationTypes == UIRemoteNotificationTypeNone)
+    if (notificationTypes == UIUserNotificationTypeNone)
         NSLog(@"PushPlugin.register: Push notification type is set to none");
 
     isInline = NO;
 
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:notificationTypes categories:nil]];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
 	
 	if (notificationMessage)			// if there is a pending startup notification
 		[self notificationReceived];	// go ahead and process it
@@ -113,7 +114,11 @@
         [results setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"appVersion"];
         
         // Check what Notifications the user has turned on.  We registered for all three, but they may have manually disabled some or all of them.
-        NSUInteger rntypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+        UIUserNotificationSettings *currentNotifSettings = [UIApplication sharedApplication].currentUserNotificationSettings;
+        UIUserNotificationType rntypes = currentNotifSettings.types;
+        if (rntypes == 0) {
+                rntypes = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+        }
 
         // Set the defaults to disabled unless we find otherwise...
         NSString *pushBadge = @"disabled";
@@ -124,13 +129,13 @@
         // one is actually disabled. So we are literally checking to see if rnTypes matches what is turned on, instead of by number. The "tricky" part is that the
         // single notification types will only match if they are the ONLY one enabled.  Likewise, when we are checking for a pair of notifications, it will only be
         // true if those two notifications are on.  This is why the code is written this way
-        if(rntypes & UIRemoteNotificationTypeBadge){
+        if(rntypes & UIUserNotificationTypeBadge){
             pushBadge = @"enabled";
         }
-        if(rntypes & UIRemoteNotificationTypeAlert) {
+        if(rntypes & UIUserNotificationTypeAlert) {
             pushAlert = @"enabled";
         }
-        if(rntypes & UIRemoteNotificationTypeSound) {
+        if(rntypes & UIUserNotificationTypeSound) {
             pushSound = @"enabled";
         }
 
